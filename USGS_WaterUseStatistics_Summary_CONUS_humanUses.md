@@ -2,7 +2,7 @@
 
 ### Water Systems Analysis Group at the University of New Hampshire
 
-    Copyright 2021,Shan Zuidema
+    Copyright 2021, University of New Hampshire
     
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,10 +20,10 @@
 The United States Geological Survey (USGS) publishes water use statistics every five years for each county in the United States and territories.  The data are provided in a variety of formats (tab delimited text, excel spreadsheets) with corresponding metadata provided in accompanying tables or hosted as HTML on their websites.  Making estimates of how water-use is changing within the United States is complicated for a number of reasons.
 
 1. The definitions of water-use categories and record-keeping has changed over-time.
-2. The water use statistics themselves are accumulated from reporting agencies and institutions and are therefore subject to variability.
-3. The variety of formats, field names, and category changes make introspection challenging.
+2. The water use statistics themselves are accumulated through agencies and institutions and may exhibit spatial variability resulting purely from differences in reporting practices and procedures.
+3. The variety of formats, and field names make introspection challenging.
 
-This notebook attempts to reduce the burden from the third challenge.  It collates county level data from 1985 through 2015 (and plans to be updated if necessary with future data releases).  The final summary of data is saved to disk as a comma-seperated-values (csv) file easily readable via a number of utilities.  An example is provided to read the resulting table with Pandas (Python).  Furthermore, derived fields are calculated and compiled into a GeoJSON file using the fiona library (if available).  Finally, display of these derived fields are illustrated using Shapely and Cartopy libraries.
+This notebook attempts to reduce the burden from the third challenge, with a specific set of documented assumptions to address the first challenge in order to create a continuous record of water use records.  It collates county level data from 1985 through 2015 (and plans to be updated if necessary with future data releases).  The final summary of data is saved to disk as a comma-seperated-values (csv) file easily readable via a number of utilities.  An example is provided to read the resulting table with Pandas (Python).  Furthermore, derived fields are calculated.  Optional cells near the end of the notebook compile statistics into a GeoJSON file using the fiona library (if available),and display an example field using Shapely and Cartopy libraries.
 
 Notes: 
 
@@ -84,9 +84,9 @@ output units   = cubic kilometers per year ($km^3 y^{-1}$)
 
 Data for year 2000 is not provided.  We calculate this value by adding the DomesticSelfSupplied usage (provided) plus the product of the PublicSuppliedPopulation (provided) and a per capita PublicSupply rate (estimated).  The per capita PublicSupply rate for 2000 is calculated as the average per capita PublicSupply rate from 1995 and 2005 for each county.
 
-Commercial use (provided for 1985 though 1995) is included as DomesticUse to maintain a consistent record.  However, Commercial use is most likely a combination of domestic and industrial uses, which is evident by discontinuities in Domestic and Industrial uses for individual counties before and after 1995.  An appropriate disaggregation of Commercial use to both Domestic and Industrial uses on a county by county basis is beyond the scope of this work.
-
 *IndustrialTotalUse*
+
+Commercial use (provided for 1985 though 1995) is included as IndustrialUse to maintain a consistent record, and follows from the high level disaggregation presented by the USGS [in this table](https://www.usgs.gov/mission-areas/water-resources/science/changes-water-use-categories?qt-science_center_objects=0#qt-science_center_objectsI).  However, Commercial use is most likely a combination of domestic and industrial uses, which is evident by discontinuities in Domestic and Industrial uses for individual counties before and after 1995.  An appropriate disaggregation of Commercial use to both Domestic and Industrial uses on a county by county basis is beyond the scope of this work.
 
 Data for years 2000 through 2015 provides only IndustrialSelfSuppliedUse.  To calculate IndustrialTotalUse we add IndustrialSelfSuppliedUse with the difference between PublicSupplyUse and DomesticPublicDeliveries. 
 
@@ -102,7 +102,7 @@ Uses=OrderedDict(Population={2015:'TP-TotPop',2010:'TP-TotPop',2005:'TP-TotPop',
           DomesticSelfPop={2015: 'DO-SSPop', 2010: 'DO-SSPop', 2005: 'DO-SSPop', 2000:"DO-SSPop",1995:'DO-SSPop',1990:'do-sspop',1985:'do-sspop'},
           DomesticTotalUse={2015:'DO-WDelv',2010:'DO-TOTAL',2005:'DO-TOTAL',
                             2000:"ofunc(DomesticTotal_2000)",
-                            1995:'ifunc(DO-WDelv,add,CO-WDelv)',1990:'ifunc(do-total,add,co-total)',1985:'ifunc(do-total,add,co-total)'},
+                            1995:'DO-WDelv',1990:'do-total',1985:'do-total'},
           DomesticPubDeliv={2015:'DO-PSDel',2010:'DO-PSDel',2005:'DO-PSDel',
                             2000:"ofunc(DomesticPubDeliv_2000)",
                             1995:'DO-PSDel',1990:'do-psdel',1985:'do-psdel'},
@@ -116,7 +116,7 @@ Uses=OrderedDict(Population={2015:'TP-TotPop',2010:'TP-TotPop',2005:'TP-TotPop',
                               2010: "ofunc(IndustrialTotal)",
                               2005: "ofunc(IndustrialTotal)",
                               2000: "ofunc(IndustrialTotal_2000)",
-                              1995:'IN-WDelv',1990:'in-total',1985:'in-total'},
+                              1995:'ifunc(IN-WDelv,add,CO-WDelv)',1990:'ifunc(in-total,add,co-total)',1985:'ifunc(in-total,add,co-total)'},
           IrrigationTotalUse={2015: 'IR-WFrTo',2010: 'IR-WFrTo', 2005: 'IR-WFrTo',2000:'IT-WFrTo',
                               1995:'IR-WFrTo',1990:'ir-frtot',1985:'ir-frtot'},
           IrrigationSurfaceUse={2015: 'IR-WSWFr', 2010: "IR-WSWFr", 2005:"IR-WSWFr",2000:"IT-WSWFr",1995:"IR-WSWFr",1990:"IR-WSWFr".lower(),1985:"IR-WSWFr".lower()},
@@ -289,12 +289,12 @@ print(df.describe())
 
              Population  DomesticSelfSupp  DomesticSelfPop  DomesticTotalUse  \
     count  2.256500e+04      21877.000000     2.186900e+04      21772.000000   
-    mean   8.798422e+04          0.001505     1.339608e+04          0.013832   
-    std    2.878891e+05          0.002868     2.516093e+04          0.053661   
+    mean   8.798422e+04          0.001505     1.339608e+04          0.012256   
+    std    2.878891e+05          0.002868     2.516093e+04          0.047704   
     min    0.000000e+00          0.000000    -1.073000e+04          0.000000   
-    25%    1.104100e+04          0.000194     1.720000e+03          0.001452   
-    50%    2.458000e+04          0.000636     5.813000e+03          0.003263   
-    75%    6.006000e+04          0.001645     1.520000e+04          0.008476   
+    25%    1.104100e+04          0.000194     1.720000e+03          0.001341   
+    50%    2.458000e+04          0.000636     5.813000e+03          0.002959   
+    75%    6.006000e+04          0.001645     1.520000e+04          0.007522   
     max    1.017029e+07          0.104749     1.010120e+06          2.236696   
     
            DomesticPubDeliv  PublicSupplyPop  PublicSupplyUse  IndustrialSelfSupp  \
@@ -309,13 +309,13 @@ print(df.describe())
     
            IndustrialTotalUse  IrrigationTotalUse  IrrigationSurfaceUse  \
     count        21866.000000        22565.000000          22565.000000   
-    mean             0.012839            0.055515              0.033284   
-    std              0.060092            0.217183              0.157381   
+    mean             0.014408            0.055515              0.033284   
+    std              0.062923            0.217183              0.157381   
     min              0.000000            0.000000              0.000000   
-    25%              0.000099            0.000097              0.000000   
-    50%              0.000982            0.000885              0.000207   
-    75%              0.005296            0.010550              0.002157   
-    max              2.034838            4.825221              3.787339   
+    25%              0.000263            0.000097              0.000000   
+    50%              0.001341            0.000885              0.000207   
+    75%              0.006706            0.010550              0.002157   
+    max              2.048830            4.825221              3.787339   
     
            IrrigationGroundWUse  LivestockTotalUse  
     count          22565.000000       21217.000000  
@@ -362,12 +362,12 @@ df.to_csv(output_file_name)
 
              Population  DomesticSelfSupp  DomesticSelfPop  DomesticTotalUse  \
     count  2.256500e+04      21877.000000     2.186900e+04      21772.000000   
-    mean   8.798422e+04          0.001505     1.339657e+04          0.013832   
-    std    2.878891e+05          0.002868     2.516057e+04          0.053661   
+    mean   8.798422e+04          0.001505     1.339657e+04          0.012256   
+    std    2.878891e+05          0.002868     2.516057e+04          0.047704   
     min    0.000000e+00          0.000000     0.000000e+00          0.000000   
-    25%    1.104100e+04          0.000194     1.720000e+03          0.001452   
-    50%    2.458000e+04          0.000636     5.813000e+03          0.003263   
-    75%    6.006000e+04          0.001645     1.520000e+04          0.008476   
+    25%    1.104100e+04          0.000194     1.720000e+03          0.001341   
+    50%    2.458000e+04          0.000636     5.813000e+03          0.002959   
+    75%    6.006000e+04          0.001645     1.520000e+04          0.007522   
     max    1.017029e+07          0.104749     1.010120e+06          2.236696   
     
            DomesticPubDeliv  PublicSupplyPop  PublicSupplyUse  IndustrialSelfSupp  \
@@ -382,13 +382,13 @@ df.to_csv(output_file_name)
     
            IndustrialTotalUse  IrrigationTotalUse  IrrigationSurfaceUse  \
     count        21866.000000        22565.000000          22565.000000   
-    mean             0.012839            0.055515              0.033284   
-    std              0.060092            0.217183              0.157381   
+    mean             0.014408            0.055515              0.033284   
+    std              0.062923            0.217183              0.157381   
     min              0.000000            0.000000              0.000000   
-    25%              0.000099            0.000097              0.000000   
-    50%              0.000982            0.000885              0.000207   
-    75%              0.005296            0.010550              0.002157   
-    max              2.034838            4.825221              3.787339   
+    25%              0.000263            0.000097              0.000000   
+    50%              0.001341            0.000885              0.000207   
+    75%              0.006706            0.010550              0.002157   
+    max              2.048830            4.825221              3.787339   
     
            IrrigationGroundWUse  LivestockTotalUse  
     count          22565.000000       21217.000000  
@@ -415,12 +415,12 @@ print(df.index)
 
              Population  DomesticSelfSupp  DomesticSelfPop  DomesticTotalUse  \
     count  2.256500e+04      21877.000000     2.186900e+04      21772.000000   
-    mean   8.798422e+04          0.001505     1.339657e+04          0.013832   
-    std    2.878891e+05          0.002868     2.516057e+04          0.053661   
+    mean   8.798422e+04          0.001505     1.339657e+04          0.012256   
+    std    2.878891e+05          0.002868     2.516057e+04          0.047704   
     min    0.000000e+00          0.000000     0.000000e+00          0.000000   
-    25%    1.104100e+04          0.000194     1.720000e+03          0.001452   
-    50%    2.458000e+04          0.000636     5.813000e+03          0.003263   
-    75%    6.006000e+04          0.001645     1.520000e+04          0.008476   
+    25%    1.104100e+04          0.000194     1.720000e+03          0.001341   
+    50%    2.458000e+04          0.000636     5.813000e+03          0.002959   
+    75%    6.006000e+04          0.001645     1.520000e+04          0.007522   
     max    1.017029e+07          0.104749     1.010120e+06          2.236696   
     
            DomesticPubDeliv  PublicSupplyPop  PublicSupplyUse  IndustrialSelfSupp  \
@@ -435,13 +435,13 @@ print(df.index)
     
            IndustrialTotalUse  IrrigationTotalUse  IrrigationSurfaceUse  \
     count        21866.000000        22565.000000          22565.000000   
-    mean             0.012839            0.055515              0.033284   
-    std              0.060092            0.217183              0.157381   
+    mean             0.014408            0.055515              0.033284   
+    std              0.062923            0.217183              0.157381   
     min              0.000000            0.000000              0.000000   
-    25%              0.000099            0.000097              0.000000   
-    50%              0.000982            0.000885              0.000207   
-    75%              0.005296            0.010550              0.002157   
-    max              2.034838            4.825221              3.787339   
+    25%              0.000263            0.000097              0.000000   
+    50%              0.001341            0.000885              0.000207   
+    75%              0.006706            0.010550              0.002157   
+    max              2.048830            4.825221              3.787339   
     
            IrrigationGroundWUse  LivestockTotalUse  
     count          22565.000000       21217.000000  
@@ -623,3 +623,8 @@ cb.set_ticks(np.arange(0, 1.01, 0.25))
 
 ![png](output_36_0.png)
 
+
+
+```python
+
+```
