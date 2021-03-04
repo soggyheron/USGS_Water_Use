@@ -1,6 +1,8 @@
 # Summarize USGS Water Use Statistics by County
 
-### Water Systems Analysis Group at the University of New Hampshire
+### Shan Zuidema 
+#### Water Systems Analysis Group, part of the Earth Systems Research Center
+#### in the Institute for the study of Earth, Oceans, and Space  at the University of New Hampshire
 
     Copyright 2021, University of New Hampshire
     
@@ -19,7 +21,7 @@
 
 The United States Geological Survey (USGS) publishes water use statistics every five years for each county in the United States and territories.  The data are provided in a variety of formats (tab delimited text, excel spreadsheets) with corresponding metadata provided in accompanying tables or hosted as HTML on their websites.  Making estimates of how water-use is changing within the United States is complicated for a number of reasons.
 
-1. The definitions of water-use categories and record-keeping has changed over-time.
+1. The definitions of water-use categories and record-keeping changed over-time.
 2. The water use statistics themselves are accumulated through agencies and institutions and may exhibit spatial variability resulting purely from differences in reporting practices and procedures.
 3. The variety of formats, and field names make introspection challenging.
 
@@ -602,7 +604,7 @@ county_geoids = [(geometry.MultiPolygon(geometry.shape(pol['geometry'])),pol['pr
 
 ```python
 cmap=plt.get_cmap('magma')
-fig = plt.figure(figsize=(6.5,4))
+fig = plt.figure(figsize=(9.5,6))
 globe = cartopy.crs.Globe(semimajor_axis=6371000.)
 proj = cartopy.crs.LambertConformal(standard_parallels=[25.0], globe=globe)
 
@@ -623,8 +625,3 @@ cb.set_ticks(np.arange(0, 1.01, 0.25))
 
 ![png](output_36_0.png)
 
-
-
-```python
-
-```

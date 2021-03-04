@@ -5,25 +5,24 @@ All volume flux units in km3/year, population in persons
 Target fields are Population and TotalUses for each category of Domestic, Industrial, Livestock, and Irrigation.
 Several fields need to be calculated from other fields for specific years.
 
-Population, DomesticSelf Supply, Domestic Self Supply population, Public Supply population, PublicSupply Use, Industrial Self Supply, Irrigation Total Use, ande Livestock Total Use are all read directly from USGS tables.
+Population, DomesticSelf Supply, Domestic Self Supply population, Public Supply population, PublicSupply Use, Industrial Self Supply, Irrigation Total Use, and Livestock Total Use are all read directly from USGS tables.
 
 Domestic Total Use:
 2005,2010, 2015: Read directly
-1985,1990,1995: sum of total domestic and total commercial. [1]
+
 2000: Domsetic Self Supply + <calculated> Domestic Public Delivered
 
 Domestic Public Delivered:
 1985,1990,1995,2005,2010,2015: Read directly
-2000: ( Public Supply Pop (2000) * ( PublicSupplyUse (1995)+PublicSupplyUse (2005))/(PublicSupplyPop(1995)+PublicSupplyPop(2005)))  [2]
+2000: ( Public Supply Pop (2000) * ( PublicSupplyUse (1995)+PublicSupplyUse (2005))/(PublicSupplyPop(1995)+PublicSupplyPop(2005)))  [1]
 
 Industrial Total Use:
 1985,1990,1995: Read directly
+1985,1990,1995: sum of total industrial and total commercial. [2]
 2000, 2005, 2010, 2015: Industrial Self Supply + max(Public Supply Use - Domestic Public Delivered, 0.0)
 
 Notes:
-[1] - The commercial classification stopped in 2000.  I've assumed that commercial is best suited to be considered domestic supply, as this water will most often need to meet drinking water quality standards, whereas some industrial uses may have lower water quality standards.  By grouping the uses such, some counties show non-smooth trends in both Domestic and Industrial water uses suggesting that this assumption is not uniformly valid in all counties.
-
-UPDATE: 1/5/2021
-Appending surface and groundwater extraction for irrigation to calculate the ratio of surface to groundwater abstractions across CONUS
+[1] - Assumes that county-wide total Domestic PublicSupply is properly captured by the Population served in the year 2000, and a per-capita PublicSupply rate estimated by the average of such available data from years 1995 and 2005.
+[2] - The commercial classification stopped in 2000.  Assumes that commercial is best suited to be considered industrial supply.  By grouping the uses such, some counties show non-smooth trends in both Domestic and Industrial water uses suggesting that this assumption is not uniformly valid in all counties.
 
 
