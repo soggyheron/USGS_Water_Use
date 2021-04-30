@@ -40,6 +40,11 @@ Sources:
 https://water.usgs.gov/watuse/data/
 USGS data is in the Public Domain.
 
+These data are described by the following publications:
+>Dieter, C.A., Maupin, M.A., Caldwell, R.R., Harris, M.A., Ivahnenko, T.I., Lovelace, J.K., Barber, N.L., Linsey, K.S., 2018. Estimated use of water in the United States in 2015 (USGS Numbered Series No. 1441), Circular. U.S. Geological Survey, Reston, VA.
+
+>Maupin, M.A., Kenny, J.F., Hutson, S.S., Lovelace, J.K., Barber, N.L., Linsey, K.S., 2014. Estimated use of water in the United States in 2010, Circular. U.S. Geological Survey, Reston, Virginia.
+
 The author provides no warranty regarding the veracity of the underlying data provided to or summarized by the USGS, and is in no way affiliated with the USGS. 
 
 

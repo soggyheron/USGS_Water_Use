@@ -25,4 +25,8 @@ Notes:
 [1] - Assumes that county-wide total Domestic PublicSupply is properly captured by the Population served in the year 2000, and a per-capita PublicSupply rate estimated by the average of such available data from years 1995 and 2005.
 [2] - The commercial classification stopped in 2000.  Assumes that commercial is best suited to be considered industrial supply.  By grouping the uses such, some counties show non-smooth trends in both Domestic and Industrial water uses suggesting that this assumption is not uniformly valid in all counties.
 
+Citations:
 
+Dieter, C.A., Maupin, M.A., Caldwell, R.R., Harris, M.A., Ivahnenko, T.I., Lovelace, J.K., Barber, N.L., Linsey, K.S., 2018. Estimated use of water in the United States in 2015 (USGS Numbered Series No. 1441), Circular. U.S. Geological Survey, Reston, VA.
+
+Maupin, M.A., Kenny, J.F., Hutson, S.S., Lovelace, J.K., Barber, N.L., Linsey, K.S., 2014. Estimated use of water in the United States in 2010, Circular. U.S. Geological Survey, Reston, Virginia.
